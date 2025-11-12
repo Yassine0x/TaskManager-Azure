@@ -210,7 +210,7 @@ else
 fi
 
 # -------------------------------------------------------------------------
-# Azure Monitor (optionnel)
+# Azure Monitor
 # -------------------------------------------------------------------------
 progress "Configuration Azure Monitor"
 if az monitor app-insights component create \
