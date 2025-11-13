@@ -209,6 +209,31 @@ else
     --public-ip-sku Standard
 fi
 
+# ------------------------------------------------------------------------
+# ETAPE 10: Deploiement de l'application dans App Service
+# ------------------------------------------------------------------------
+progress "Etape 10/10: Deploiement de l'application dans App Service"
+
+# Le chemin vers app.zip
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+APP_ZIP_PATH="$(realpath "$SCRIPT_DIR/../../app.zip")"
+
+# Check the file exists
+if [[ ! -f "$APP_ZIP_PATH" ]]; then
+    echo "❌ app.zip not found at $APP_ZIP_PATH"
+    exit 1
+fi
+
+echo "Déploiement de l'application depuis $APP_ZIP_PATH ..."
+
+az webapp deployment source config-zip -g $resourceGroup -n $webAppName --src $APP_ZIP_PATH
+
+
+echo "✅ Application déployée avec succès sur App Service !"
+echo "URL de l'application : https://$webAppName.azurewebsites.net"
+
+
 # -------------------------------------------------------------------------
 # Azure Monitor
 # -------------------------------------------------------------------------
