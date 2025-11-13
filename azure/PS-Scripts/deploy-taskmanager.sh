@@ -238,20 +238,24 @@ echo "URL de l'application : https://$webAppName.azurewebsites.net"
 # Azure Monitor
 # -------------------------------------------------------------------------
 progress "Configuration Azure Monitor"
-if az monitor app-insights component create \
+# Créer un workspace Log Analytics dans votre RG
+az monitor log-analytics workspace create \
+  --resource-group "$resourceGroup" \
+  --workspace-name "law-taskmanager" \
+  --location "$location"
+
+# Créer App Insights lié à ce workspace (pas de RG séparé)
+workspaceId=$(az monitor log-analytics workspace show \
+  --resource-group "$resourceGroup" \
+  --workspace-name "law-taskmanager" \
+  --query id -o tsv)
+
+az monitor app-insights component create \
   --app "$webAppName" \
   --location "$location" \
   --resource-group "$resourceGroup" \
-  --application-type web >/dev/null; then
-  instrumentationKey=$(az monitor app-insights component show \
-    --app "$webAppName" \
-    --resource-group "$resourceGroup" \
-    --query "instrumentationKey" -o tsv)
-  az webapp config appsettings set \
-    --name "$webAppName" \
-    --resource-group "$resourceGroup" \
-    --settings "APPINSIGHTS_INSTRUMENTATIONKEY=$instrumentationKey"
-fi
+  --application-type web \
+  --workspace "$workspaceId"
 
 # -------------------------------------------------------------------------
 # RÉSUMÉ
